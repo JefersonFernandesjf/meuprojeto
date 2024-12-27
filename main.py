@@ -21,7 +21,14 @@ def main():
     
     root = tk.Tk()
     root.title("Sistema de Gerenciamento de Instituição")
-    root.state('zoomed')  # Abre a janela em tela cheia
+    root.geometry("1024x768")  # Tamanho inicial da janela
+
+    # Aplicar tema
+    style = ttk.Style()
+    style.theme_use('clam')
+    style.configure("TButton", font=("Arial", 12), padding=6)
+    style.configure("TLabel", font=("Arial", 14))
+    style.configure("TEntry", font=("Arial", 14))
 
     menubar = tk.Menu(root)
     config_menu = tk.Menu(menubar, tearoff=0)
@@ -31,26 +38,31 @@ def main():
     menubar.add_cascade(label="Configurações", menu=config_menu)
     root.config(menu=menubar)
 
-    style = ttk.Style()
-    style.configure("TButton", font=("Arial", 10), padding=10)
-
+    # Frame para os botões de navegação
     frame_buttons = tk.Frame(root)
-    frame_buttons.pack(side="top", fill="x")
+    frame_buttons.pack(side="left", fill="y", padx=10, pady=10)
 
+    # Barra de rolagem vertical
     canvas = tk.Canvas(frame_buttons)
-    canvas.pack(side="left", fill="x", expand=True)
+    scrollbar = ttk.Scrollbar(frame_buttons, orient="vertical", command=canvas.yview)
+    scrollable_frame = ttk.Frame(canvas)
 
-    scrollbar = ttk.Scrollbar(frame_buttons, orient="horizontal", command=canvas.xview)
-    scrollbar.pack(side="bottom", fill="x")
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")
+        )
+    )
 
-    button_frame = tk.Frame(canvas)
-    button_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+    canvas.configure(yscrollcommand=scrollbar.set)
 
-    canvas.create_window((0, 0), window=button_frame, anchor="nw")
-    canvas.configure(xscrollcommand=scrollbar.set)
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
 
+    # Frame para o conteúdo das páginas
     frame_content = tk.Frame(root)
-    frame_content.pack(fill="both", expand=True)
+    frame_content.pack(side="right", fill="both", expand=True, padx=10, pady=10)
 
     def show_page(page):
         for widget in frame_content.winfo_children():
@@ -69,8 +81,8 @@ def main():
         ("Editar Informações", pagina_editar_informacoes)
     ]
 
-    for (text, page) in buttons:
-        ttk.Button(button_frame, text=text, command=lambda p=page: show_page(p), style="TButton").pack(side="left", padx=5, pady=5)
+    for text, page in buttons:
+        ttk.Button(scrollable_frame, text=text, command=lambda p=page: show_page(p), style="TButton").pack(pady=5)
 
     root.mainloop()
 

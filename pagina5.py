@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 from db_config import conectar_bd
 from editar_usuario import pagina_editar_usuario
 import cx_Oracle
@@ -54,62 +54,108 @@ def excluir_usuario(id_usuario):
                 
                 connection.commit()
                 messagebox.showinfo("Sucesso", "Usuário e registros relacionados excluídos com sucesso!")
+                return True
     except cx_Oracle.DatabaseError as e:
         messagebox.showerror("Erro", f"Erro ao excluir usuário e registros relacionados: {e}")
         return False
-    return True
 
 def abrir_pesquisa(parent):
     frame = tk.Frame(parent)
     frame.pack(fill="both", expand=True)
 
-    tk.Label(frame, text="Nome do Usuário:", font=FONT).grid(row=0, column=0, padx=20, pady=10)
-    entry_nome = tk.Entry(frame, width=30, font=FONT)
-    entry_nome.grid(row=0, column=1, padx=20, pady=10)
+    canvas = tk.Canvas(frame)
+    canvas.pack(side="left", fill="both", expand=True)
+
+    h_scrollbar = ttk.Scrollbar(frame, orient="horizontal", command=canvas.xview)
+    h_scrollbar.pack(side="bottom", fill="x")
+
+    v_scrollbar = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+    v_scrollbar.pack(side="right", fill="y")
+
+    scrollable_frame = tk.Frame(canvas)
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")
+        )
+    )
+
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+    canvas.configure(xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set)
+
+    scrollable_frame.grid_columnconfigure(0, weight=1)
+    scrollable_frame.grid_columnconfigure(1, weight=1)
+
+    ttk.Label(scrollable_frame, text="Nome do Usuário:", font=FONT).grid(row=0, column=0, padx=20, pady=10, sticky="e")
+    entry_nome = ttk.Entry(scrollable_frame, width=30, font=FONT)
+    entry_nome.grid(row=0, column=1, padx=20, pady=10, sticky="w")
 
     def exibir_resultados():
         # Limpar widgets existentes (evitar duplicação)
-        for widget in frame.grid_slaves():
+        for widget in scrollable_frame.grid_slaves():
             if int(widget.grid_info()["row"]) > 1:
                 widget.grid_forget()
 
         nome = entry_nome.get()
         resultados, dados_usuario = buscar_usuario(nome)
-        resultados_label = tk.Label(frame, text=resultados, font=FONT, justify="left")
+        resultados_label = ttk.Label(scrollable_frame, text=resultados, font=FONT, justify="left")
         resultados_label.grid(row=2, column=0, columnspan=2, padx=20, pady=10)
 
         if dados_usuario:
             id_usuario, nome, endereco, telefone, email, observacao, *_ = dados_usuario
-            tk.Button(frame, text="Editar Informações do Usuário", font=FONT, command=lambda: pagina_editar_usuario(id_usuario, nome, endereco, telefone, email, observacao)).grid(row=3, column=0, padx=20, pady=10)
-            tk.Button(frame, text="Excluir Usuário", font=FONT, command=lambda: excluir_usuario(id_usuario)).grid(row=3, column=1, padx=20, pady=10)
+            ttk.Button(scrollable_frame, text="Editar Informações do Usuário", command=lambda: pagina_editar_usuario(id_usuario, nome, endereco, telefone, email, observacao)).grid(row=3, column=0, padx=20, pady=10)
+            ttk.Button(scrollable_frame, text="Excluir Usuário", command=lambda: excluir_usuario(id_usuario)).grid(row=3, column=1, padx=20, pady=10)
 
-    tk.Button(frame, text="Pesquisar", font=FONT, command=exibir_resultados).grid(row=1, column=0, columnspan=2, padx=20, pady=10)
+    ttk.Button(scrollable_frame, text="Pesquisar", command=exibir_resultados).grid(row=1, column=0, columnspan=2, padx=20, pady=10)
 
 def mostrar_ids(parent):
     frame = tk.Frame(parent)
     frame.pack(fill="both", expand=True)
 
-    tk.Label(frame, text="IDs de Usuários:", font=FONT).grid(row=0, column=0, padx=20, pady=10)
+    canvas = tk.Canvas(frame)
+    canvas.pack(side="left", fill="both", expand=True)
+
+    h_scrollbar = ttk.Scrollbar(frame, orient="horizontal", command=canvas.xview)
+    h_scrollbar.pack(side="bottom", fill="x")
+
+    v_scrollbar = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+    v_scrollbar.pack(side="right", fill="y")
+
+    scrollable_frame = tk.Frame(canvas)
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")
+        )
+    )
+
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+    canvas.configure(xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set)
+
+    scrollable_frame.grid_columnconfigure(0, weight=1)
+    scrollable_frame.grid_columnconfigure(1, weight=1)
+
+    ttk.Label(scrollable_frame, text="IDs de Usuários:", font=FONT).grid(row=0, column=0, padx=20, pady=10, sticky="e")
     try:
         with conectar_bd() as connection:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT id_usuario, nome FROM usuarios")
                 usuarios = cursor.fetchall()
                 texto_usuarios = "\n".join([f"{id_usuario}: {nome}" for id_usuario, nome in usuarios])
-                tk.Label(frame, text=texto_usuarios, font=FONT, justify="left").grid(row=1, column=0, padx=20, pady=10)
+                ttk.Label(scrollable_frame, text=texto_usuarios, font=FONT, justify="left").grid(row=1, column=0, padx=20, pady=10, sticky="w")
     except cx_Oracle.DatabaseError as e:
-        tk.messagebox.showerror("Erro", f"Erro ao buscar IDs de usuários: {e}")
+        messagebox.showerror("Erro", f"Erro ao buscar IDs de usuários: {e}")
 
-    tk.Label(frame, text="IDs de Instituições:", font=FONT).grid(row=0, column=1, padx=20, pady=10)
+    ttk.Label(scrollable_frame, text="IDs de Instituições:", font=FONT).grid(row=0, column=1, padx=20, pady=10, sticky="e")
     try:
         with conectar_bd() as connection:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT id_instituicao, nome FROM instituicao")
                 instituicoes = cursor.fetchall()
                 texto_instituicoes = "\n".join([f"{id_instituicao}: {nome}" for id_instituicao, nome in instituicoes])
-                tk.Label(frame, text=texto_instituicoes, font=FONT, justify="left").grid(row=1, column=1, padx=20, pady=10)
+                ttk.Label(scrollable_frame, text=texto_instituicoes, font=FONT, justify="left").grid(row=1, column=1, padx=20, pady=10, sticky="w")
     except cx_Oracle.DatabaseError as e:
-        tk.messagebox.showerror("Erro", f"Erro ao buscar IDs de instituições: {e}")
+        messagebox.showerror("Erro", f"Erro ao buscar IDs de instituições: {e}")
 
 # Código principal
 if __name__ == "__main__":

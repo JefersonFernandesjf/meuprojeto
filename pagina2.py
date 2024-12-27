@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from db_config import conectar_bd
 import cx_Oracle
 
@@ -15,9 +15,10 @@ def cadastrar_usuario(nome, endereco, telefone, email, observacao, id_instituica
                 """
                 cursor.execute(query, [nome, endereco, telefone, email, observacao, id_instituicao])
                 connection.commit()
+                messagebox.showinfo("Sucesso", "Usuário cadastrado com sucesso!")
                 return True
     except cx_Oracle.DatabaseError as e:
-        print(f"Erro ao cadastrar usuário: {e}")
+        messagebox.showerror("Erro", f"Erro ao cadastrar usuário: {e}")
         return False
 
 def cadastrar_medicamento_particular(id_usuario, nome_medicamento, quantidade):
@@ -30,10 +31,10 @@ def cadastrar_medicamento_particular(id_usuario, nome_medicamento, quantidade):
                 """
                 cursor.execute(query, [id_usuario, nome_medicamento, quantidade])
                 connection.commit()
-                print("Medicamento particular cadastrado com sucesso!")
+                messagebox.showinfo("Sucesso", "Medicamento particular cadastrado com sucesso!")
                 return True
     except cx_Oracle.DatabaseError as e:
-        print(f"Erro ao cadastrar medicamento particular: {e}")
+        messagebox.showerror("Erro", f"Erro ao cadastrar medicamento particular: {e}")
         return False
 
 def cadastrar_medicamento_enfermaria(id_usuario, nome_medicamento, quantidade, id_enfermaria):
@@ -55,10 +56,10 @@ def cadastrar_medicamento_enfermaria(id_usuario, nome_medicamento, quantidade, i
                 cursor.execute(query_estoque, [quantidade, id_enfermaria, nome_medicamento])
 
                 connection.commit()
-                print("Medicamento da enfermaria cadastrado e estoque atualizado com sucesso!")
+                messagebox.showinfo("Sucesso", "Medicamento da enfermaria cadastrado e estoque atualizado com sucesso!")
                 return True
     except cx_Oracle.DatabaseError as e:
-        print(f"Erro ao cadastrar medicamento da enfermaria: {e}")
+        messagebox.showerror("Erro", f"Erro ao cadastrar medicamento da enfermaria: {e}")
         return False
 
 def buscar_instituicoes():
@@ -69,7 +70,7 @@ def buscar_instituicoes():
                 cursor.execute(query)
                 return cursor.fetchall()
     except cx_Oracle.DatabaseError as e:
-        print(f"Erro ao buscar instituições: {e}")
+        messagebox.showerror("Erro", f"Erro ao buscar instituições: {e}")
         return []
 
 def buscar_id_usuario(nome):
@@ -81,60 +82,83 @@ def buscar_id_usuario(nome):
                 resultado = cursor.fetchone()
                 return resultado[0] if resultado else None
     except cx_Oracle.DatabaseError as e:
-        print(f"Erro ao buscar ID do usuário: {e}")
+        messagebox.showerror("Erro", f"Erro ao buscar ID do usuário: {e}")
         return None
 
 def pagina2(parent):
     frame = tk.Frame(parent)
     frame.pack(fill="both", expand=True)
 
-    tk.Label(frame, text="Nome do Usuário:", font=FONT).grid(row=0, column=0, padx=20, pady=10)
-    entry_nome_usuario = tk.Entry(frame, width=30, font=FONT)
-    entry_nome_usuario.grid(row=0, column=1, padx=20, pady=10)
+    canvas = tk.Canvas(frame)
+    canvas.pack(side="left", fill="both", expand=True)
 
-    tk.Label(frame, text="Endereço:", font=FONT).grid(row=1, column=0, padx=20, pady=10)
-    entry_endereco_usuario = tk.Entry(frame, width=30, font=FONT)
-    entry_endereco_usuario.grid(row=1, column=1, padx=20, pady=10)
+    h_scrollbar = ttk.Scrollbar(frame, orient="horizontal", command=canvas.xview)
+    h_scrollbar.pack(side="bottom", fill="x")
 
-    tk.Label(frame, text="Telefone:", font=FONT).grid(row=2, column=0, padx=20, pady=10)
-    entry_telefone_usuario = tk.Entry(frame, width=30, font=FONT)
-    entry_telefone_usuario.grid(row=2, column=1, padx=20, pady=10)
+    v_scrollbar = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+    v_scrollbar.pack(side="right", fill="y")
 
-    tk.Label(frame, text="Email:", font=FONT).grid(row=3, column=0, padx=20, pady=10)
-    entry_email_usuario = tk.Entry(frame, width=30, font=FONT)
-    entry_email_usuario.grid(row=3, column=1, padx=20, pady=10)
+    scrollable_frame = tk.Frame(canvas)
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")
+        )
+    )
 
-    tk.Label(frame, text="Observação (até 200 caracteres):", font=FONT).grid(row=4, column=0, padx=20, pady=10)
-    entry_observacao = tk.Text(frame, width=30, height=5, font=FONT)
-    entry_observacao.grid(row=4, column=1, padx=20, pady=10)
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+    canvas.configure(xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set)
 
-    tk.Label(frame, text="Instituição:", font=FONT).grid(row=5, column=0, padx=20, pady=10)
-    combo_instituicao = ttk.Combobox(frame, width=28, font=FONT)
-    combo_instituicao.grid(row=5, column=1, padx=20, pady=10)
+    scrollable_frame.grid_columnconfigure(0, weight=1)
+    scrollable_frame.grid_columnconfigure(1, weight=1)
+
+    ttk.Label(scrollable_frame, text="Nome do Usuário:", font=FONT).grid(row=0, column=0, padx=20, pady=10, sticky="e")
+    entry_nome_usuario = ttk.Entry(scrollable_frame, width=30, font=FONT)
+    entry_nome_usuario.grid(row=0, column=1, padx=20, pady=10, sticky="w")
+
+    ttk.Label(scrollable_frame, text="Endereço:", font=FONT).grid(row=1, column=0, padx=20, pady=10, sticky="e")
+    entry_endereco_usuario = ttk.Entry(scrollable_frame, width=30, font=FONT)
+    entry_endereco_usuario.grid(row=1, column=1, padx=20, pady=10, sticky="w")
+
+    ttk.Label(scrollable_frame, text="Telefone:", font=FONT).grid(row=2, column=0, padx=20, pady=10, sticky="e")
+    entry_telefone_usuario = ttk.Entry(scrollable_frame, width=30, font=FONT)
+    entry_telefone_usuario.grid(row=2, column=1, padx=20, pady=10, sticky="w")
+
+    ttk.Label(scrollable_frame, text="Email:", font=FONT).grid(row=3, column=0, padx=20, pady=10, sticky="e")
+    entry_email_usuario = ttk.Entry(scrollable_frame, width=30, font=FONT)
+    entry_email_usuario.grid(row=3, column=1, padx=20, pady=10, sticky="w")
+
+    ttk.Label(scrollable_frame, text="Observação (até 200 caracteres):", font=FONT).grid(row=4, column=0, padx=20, pady=10, sticky="e")
+    entry_observacao = tk.Text(scrollable_frame, width=30, height=5, font=FONT)
+    entry_observacao.grid(row=4, column=1, padx=20, pady=10, sticky="w")
+
+    ttk.Label(scrollable_frame, text="Instituição:", font=FONT).grid(row=5, column=0, padx=20, pady=10, sticky="e")
+    combo_instituicao = ttk.Combobox(scrollable_frame, width=28, font=FONT)
+    combo_instituicao.grid(row=5, column=1, padx=20, pady=10, sticky="w")
 
     instituicoes = buscar_instituicoes()
     combo_instituicao['values'] = [f"{id} - {nome}" for id, nome in instituicoes]
 
-    frame_medicamentos = tk.Frame(frame)
+    frame_medicamentos = tk.Frame(scrollable_frame)
     frame_medicamentos.grid(row=6, column=0, columnspan=2, pady=10)
 
-    tk.Label(frame_medicamentos, text="Nome do Medicamento", font=FONT).grid(row=0, column=0, padx=20, pady=5)
-    tk.Label(frame_medicamentos, text="Quantidade", font=FONT).grid(row=0, column=1, padx=20, pady=5)
-    tk.Label(frame_medicamentos, text="Enfermaria (ID)", font=FONT).grid(row=0, column=2, padx=20, pady=5)
+    ttk.Label(frame_medicamentos, text="Nome do Medicamento", font=FONT).grid(row=0, column=0, padx=20, pady=5)
+    ttk.Label(frame_medicamentos, text="Quantidade", font=FONT).grid(row=0, column=1, padx=20, pady=5)
+    ttk.Label(frame_medicamentos, text="Enfermaria (ID)", font=FONT).grid(row=0, column=2, padx=20, pady=5)
 
     medicamentos = []
 
     def adicionar_medicamento():
         linha = len(medicamentos)
-        entry_nome_medicamento = tk.Entry(frame_medicamentos, width=30, font=FONT)
+        entry_nome_medicamento = ttk.Entry(frame_medicamentos, width=30, font=FONT)
         entry_nome_medicamento.grid(row=linha + 1, column=0, padx=20, pady=5)
-        entry_quantidade = tk.Entry(frame_medicamentos, width=30, font=FONT)
+        entry_quantidade = ttk.Entry(frame_medicamentos, width=30, font=FONT)
         entry_quantidade.grid(row=linha + 1, column=1, padx=20, pady=5)
-        entry_id_enfermaria = tk.Entry(frame_medicamentos, width=30, font=FONT)
+        entry_id_enfermaria = ttk.Entry(frame_medicamentos, width=30, font=FONT)
         entry_id_enfermaria.grid(row=linha + 1, column=2, padx=20, pady=5)
         medicamentos.append({'nome': entry_nome_medicamento, 'quantidade': entry_quantidade, 'id_enfermaria': entry_id_enfermaria})
 
-    tk.Button(frame, text="Adicionar Medicamento", font=FONT, command=adicionar_medicamento).grid(row=7, column=0, columnspan=2, pady=10)
+    ttk.Button(scrollable_frame, text="Adicionar Medicamento", command=adicionar_medicamento).grid(row=7, column=0, columnspan=2, pady=10)
 
     def cadastrar():
         nome_usuario = entry_nome_usuario.get()
@@ -147,11 +171,11 @@ def pagina2(parent):
         if instituicao_selecionada:
             id_instituicao = int(instituicao_selecionada.split(" - ")[0])
         else:
-            print("Aviso: Por favor, selecione uma instituição.")
+            messagebox.showwarning("Aviso", "Por favor, selecione uma instituição.")
             return
 
         if len(observacao) > 200:
-            print("Aviso: Observação deve ter no máximo 200 caracteres.")
+            messagebox.showwarning("Aviso", "Observação deve ter no máximo 200 caracteres.")
             return
 
         if not cadastrar_usuario(nome_usuario, endereco_usuario, telefone_usuario, email_usuario, observacao, id_instituicao):
@@ -167,7 +191,9 @@ def pagina2(parent):
         for medicamento in medicamentos_enfermaria:
             cadastrar_medicamento_enfermaria(id_usuario, medicamento['nome'].get(), medicamento['quantidade'].get(), medicamento['id_enfermaria'].get())
 
-    tk.Button(frame, text="Cadastrar Usuário", font=FONT, command=cadastrar).grid(row=8, column=0, columnspan=2, pady=10)
+        messagebox.showinfo("Sucesso", "Usuário e medicamentos cadastrados com sucesso!")
+
+    ttk.Button(scrollable_frame, text="Cadastrar Usuário", command=cadastrar).grid(row=8, column=0, columnspan=2, pady=10)
 
 # Código principal
 if __name__ == "__main__":
@@ -175,3 +201,4 @@ if __name__ == "__main__":
     root.withdraw()  # Ocultar a janela principal
     pagina2(root)
     root.mainloop()
+ 
