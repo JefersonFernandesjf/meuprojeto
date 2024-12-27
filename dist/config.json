@@ -1,0 +1,5 @@
+{
+    "DB_USER": "SYSTEM",
+    "DB_PASSWORD": "cloud1%",
+    "DB_DSN": "localhost/XE"
+}
