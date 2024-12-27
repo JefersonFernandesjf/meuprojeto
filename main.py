@@ -9,7 +9,7 @@ logger = logging.getLogger()
 from pagina1 import pagina1
 from pagina_estoque import pagina_estoque
 from pagina2 import pagina2
-from pagina3 import pagina3
+from pagina_enfermaria import pagina_enfermaria
 from pagina4 import pagina4
 from pagina5 import mostrar_ids
 from pagina_informacoes_enfermaria import pagina_informacoes_enfermaria
@@ -73,7 +73,7 @@ def main():
         ("Cadastro de Instituição", lambda: show_page(pagina1)),
         ("Estoque da Instituição", lambda: show_page(pagina_estoque)),
         ("Cadastro de Usuário", lambda: show_page(pagina2)),
-        ("Produtos na Enfermaria", lambda: show_page(pagina3)),
+        ("Cadastro de Enfermaria e Medicamentos", lambda: show_page(pagina_enfermaria)),
         ("Cadastro de Quartos", lambda: show_page(pagina4)),
         ("Pesquisa de Usuários", lambda: show_page(mostrar_ids)),
         ("IDs de Usuários e Instituições", lambda: show_page(mostrar_ids)),
