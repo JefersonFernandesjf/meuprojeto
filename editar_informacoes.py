@@ -5,7 +5,7 @@ import cx_Oracle
 
 FONT = ("Arial", 14)
 
-def atualizar_informacoes(id_usuario, nome, endereco, telefone, email, observacao):
+def atualizar_informacoes_usuario(id_usuario, nome, endereco, telefone, email, observacao):
     try:
         with conectar_bd() as connection:
             with connection.cursor() as cursor:
@@ -16,13 +16,30 @@ def atualizar_informacoes(id_usuario, nome, endereco, telefone, email, observaca
                 """
                 cursor.execute(query, [nome, endereco, telefone, email, observacao, id_usuario])
                 connection.commit()
-                messagebox.showinfo("Sucesso", "Informações atualizadas com sucesso!")
+                messagebox.showinfo("Sucesso", "Informações do usuário atualizadas com sucesso!")
                 return True
     except cx_Oracle.DatabaseError as e:
-        messagebox.showerror("Erro", f"Erro ao atualizar informações: {e}")
+        messagebox.showerror("Erro", f"Erro ao atualizar informações do usuário: {e}")
         return False
 
-def pagina_editar_informacoes(parent, id_usuario, nome, endereco, telefone, email, observacao):
+def atualizar_informacoes_instituicao(id_instituicao, nome_instituicao, endereco_instituicao, telefone_instituicao, email_instituicao):
+    try:
+        with conectar_bd() as connection:
+            with connection.cursor() as cursor:
+                query = """
+                    UPDATE instituicao 
+                    SET nome = :1, endereco = :2, telefone = :3, email = :4
+                    WHERE id_instituicao = :5
+                """
+                cursor.execute(query, [nome_instituicao, endereco_instituicao, telefone_instituicao, email_instituicao, id_instituicao])
+                connection.commit()
+                messagebox.showinfo("Sucesso", "Informações da instituição atualizadas com sucesso!")
+                return True
+    except cx_Oracle.DatabaseError as e:
+        messagebox.showerror("Erro", f"Erro ao atualizar informações da instituição: {e}")
+        return False
+
+def pagina_editar_informacoes(parent, id_usuario, nome, endereco, telefone, email, observacao, id_instituicao, nome_instituicao, endereco_instituicao, telefone_instituicao, email_instituicao):
     frame = tk.Frame(parent)
     frame.pack(fill="both", expand=True)
 
@@ -49,36 +66,64 @@ def pagina_editar_informacoes(parent, id_usuario, nome, endereco, telefone, emai
     scrollable_frame.grid_columnconfigure(0, weight=1)
     scrollable_frame.grid_columnconfigure(1, weight=1)
 
+    # Informações do Usuário
     ttk.Label(scrollable_frame, text="ID do Usuário:", font=FONT).grid(row=0, column=0, padx=20, pady=10, sticky="e")
     entry_id_usuario = ttk.Entry(scrollable_frame, width=30, font=FONT)
     entry_id_usuario.grid(row=0, column=1, padx=20, pady=10, sticky="w")
     entry_id_usuario.insert(0, id_usuario)
     entry_id_usuario.config(state='disabled')
 
-    ttk.Label(scrollable_frame, text="Nome:", font=FONT).grid(row=1, column=0, padx=20, pady=10, sticky="e")
+    ttk.Label(scrollable_frame, text="Nome do Usuário:", font=FONT).grid(row=1, column=0, padx=20, pady=10, sticky="e")
     entry_nome = ttk.Entry(scrollable_frame, width=30, font=FONT)
     entry_nome.grid(row=1, column=1, padx=20, pady=10, sticky="w")
     entry_nome.insert(0, nome)
 
-    ttk.Label(scrollable_frame, text="Endereço:", font=FONT).grid(row=2, column=0, padx=20, pady=10, sticky="e")
+    ttk.Label(scrollable_frame, text="Endereço do Usuário:", font=FONT).grid(row=2, column=0, padx=20, pady=10, sticky="e")
     entry_endereco = ttk.Entry(scrollable_frame, width=30, font=FONT)
     entry_endereco.grid(row=2, column=1, padx=20, pady=10, sticky="w")
     entry_endereco.insert(0, endereco)
 
-    ttk.Label(scrollable_frame, text="Telefone:", font=FONT).grid(row=3, column=0, padx=20, pady=10, sticky="e")
+    ttk.Label(scrollable_frame, text="Telefone do Usuário:", font=FONT).grid(row=3, column=0, padx=20, pady=10, sticky="e")
     entry_telefone = ttk.Entry(scrollable_frame, width=30, font=FONT)
     entry_telefone.grid(row=3, column=1, padx=20, pady=10, sticky="w")
     entry_telefone.insert(0, telefone)
 
-    ttk.Label(scrollable_frame, text="Email:", font=FONT).grid(row=4, column=0, padx=20, pady=10, sticky="e")
+    ttk.Label(scrollable_frame, text="Email do Usuário:", font=FONT).grid(row=4, column=0, padx=20, pady=10, sticky="e")
     entry_email = ttk.Entry(scrollable_frame, width=30, font=FONT)
     entry_email.grid(row=4, column=1, padx=20, pady=10, sticky="w")
     entry_email.insert(0, email)
 
-    ttk.Label(scrollable_frame, text="Observação:", font=FONT).grid(row=5, column=0, padx=20, pady=10, sticky="e")
+    ttk.Label(scrollable_frame, text="Observação do Usuário:", font=FONT).grid(row=5, column=0, padx=20, pady=10, sticky="e")
     entry_observacao = tk.Text(scrollable_frame, width=30, height=5, font=FONT)
     entry_observacao.grid(row=5, column=1, padx=20, pady=10, sticky="w")
     entry_observacao.insert("1.0", observacao)
+
+    # Informações da Instituição
+    ttk.Label(scrollable_frame, text="ID da Instituição:", font=FONT).grid(row=6, column=0, padx=20, pady=10, sticky="e")
+    entry_id_instituicao = ttk.Entry(scrollable_frame, width=30, font=FONT)
+    entry_id_instituicao.grid(row=6, column=1, padx=20, pady=10, sticky="w")
+    entry_id_instituicao.insert(0, id_instituicao)
+    entry_id_instituicao.config(state='disabled')
+
+    ttk.Label(scrollable_frame, text="Nome da Instituição:", font=FONT).grid(row=7, column=0, padx=20, pady=10, sticky="e")
+    entry_nome_instituicao = ttk.Entry(scrollable_frame, width=30, font=FONT)
+    entry_nome_instituicao.grid(row=7, column=1, padx=20, pady=10, sticky="w")
+    entry_nome_instituicao.insert(0, nome_instituicao)
+
+    ttk.Label(scrollable_frame, text="Endereço da Instituição:", font=FONT).grid(row=8, column=0, padx=20, pady=10, sticky="e")
+    entry_endereco_instituicao = ttk.Entry(scrollable_frame, width=30, font=FONT)
+    entry_endereco_instituicao.grid(row=8, column=1, padx=20, pady=10, sticky="w")
+    entry_endereco_instituicao.insert(0, endereco_instituicao)
+
+    ttk.Label(scrollable_frame, text="Telefone da Instituição:", font=FONT).grid(row=9, column=0, padx=20, pady=10, sticky="e")
+    entry_telefone_instituicao = ttk.Entry(scrollable_frame, width=30, font=FONT)
+    entry_telefone_instituicao.grid(row=9, column=1, padx=20, pady=10, sticky="w")
+    entry_telefone_instituicao.insert(0, telefone_instituicao)
+
+    ttk.Label(scrollable_frame, text="Email da Instituição:", font=FONT).grid(row=10, column=0, padx=20, pady=10, sticky="e")
+    entry_email_instituicao = ttk.Entry(scrollable_frame, width=30, font=FONT)
+    entry_email_instituicao.grid(row=10, column=1, padx=20, pady=10, sticky="w")
+    entry_email_instituicao.insert(0, email_instituicao)
 
     def atualizar():
         novo_nome = entry_nome.get()
@@ -86,15 +131,25 @@ def pagina_editar_informacoes(parent, id_usuario, nome, endereco, telefone, emai
         novo_telefone = entry_telefone.get()
         novo_email = entry_email.get()
         nova_observacao = entry_observacao.get("1.0", "end-1c")
+        
+        nome_nova_instituicao = entry_nome_instituicao.get()
+        endereco_nova_instituicao = entry_endereco_instituicao.get()
+        telefone_nova_instituicao = entry_telefone_instituicao.get()
+        email_novo_instituicao = entry_email_instituicao.get()
 
-        if not atualizar_informacoes(id_usuario, novo_nome, novo_endereco, novo_telefone, novo_email, nova_observacao):
-            messagebox.showerror("Erro", "Erro ao atualizar informações.")
+        if not atualizar_informacoes_usuario(id_usuario, novo_nome, novo_endereco, novo_telefone, novo_email, nova_observacao):
+            return
+        if not atualizar_informacoes_instituicao(id_instituicao, nome_nova_instituicao, endereco_nova_instituicao, telefone_nova_instituicao, email_novo_instituicao):
+            return
+        if not atualizar_informacoes_instituicao(id_instituicao, nome_nova_instituicao, endereco_nova_instituicao, telefone_nova_instituicao, email_novo_instituicao):
+            return
 
-    ttk.Button(scrollable_frame, text="Atualizar Informações", command=atualizar).grid(row=6, column=0, columnspan=2, pady=10)
+    ttk.Button(scrollable_frame, text="Atualizar Informações", command=atualizar).grid(row=11, column=0, columnspan=2, pady=10)
 
 # Código principal
 if __name__ == "__main__":
     root = tk.Tk()
     root.withdraw()  # Ocultar a janela principal
-    pagina_editar_informacoes(root, 1, "Nome Exemplo", "Endereço Exemplo", "Telefone Exemplo", "Email Exemplo", "Observação Exemplo")
+    pagina_editar_informacoes(root, 1, "Nome Exemplo", "Endereço Exemplo", "Telefone Exemplo", "Email Exemplo", "Observação Exemplo",
+                              1, "Nome Instituição Exemplo", "Endereço Instituição Exemplo", "Telefone Instituição Exemplo", "Email Instituição Exemplo")
     root.mainloop()

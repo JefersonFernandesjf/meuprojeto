@@ -10,30 +10,64 @@ def buscar_informacoes_enfermaria():
         with conectar_bd() as connection:
             with connection.cursor() as cursor:
                 query = """
-                    SELECT nome_produto, quantidade, tipo_produto
-                    FROM estoque
-                    WHERE id_instituicao IS NOT NULL
+                    SELECT 
+                        e.id_enfermaria, e.medicamento, e.quantidade, e.data_registro,
+                        i.nome_instituicao
+                    FROM enfermaria e
+                    JOIN instituicao i ON e.id_instituicao = i.id_instituicao
                 """
                 cursor.execute(query)
-                return cursor.fetchall()
+                resultados = cursor.fetchall()
+                
+                if resultados:
+                    informacoes = ""
+                    for linha in resultados:
+                        informacoes += f"ID Enfermaria: {linha[0]}\n"
+                        informacoes += f"Medicamento: {linha[1]}\nQuantidade: {linha[2]}\nData de Registro: {linha[3]}\n"
+                        informacoes += f"Instituição: {linha[4]}\n\n"
+                    return informacoes
+                else:
+                    return "Nenhuma informação encontrada."
     except cx_Oracle.DatabaseError as e:
-        messagebox.showerror("Erro", f"Erro ao buscar informações da enfermaria: {e}")
-        return []
+        return f"Erro ao buscar informações: {e}"
 
 def pagina_informacoes_enfermaria(parent):
     frame = tk.Frame(parent)
     frame.pack(fill="both", expand=True)
 
-    frame.grid_columnconfigure(0, weight=1)
-    frame.grid_columnconfigure(1, weight=1)
+    canvas = tk.Canvas(frame)
+    canvas.pack(side="left", fill="both", expand=True)
 
-    informacoes = buscar_informacoes_enfermaria()
-    texto_informacoes = "\n".join([f"Produto: {nome} - Quantidade: {quantidade} - Tipo: {tipo}" for nome, quantidade, tipo in informacoes])
+    h_scrollbar = ttk.Scrollbar(frame, orient="horizontal", command=canvas.xview)
+    h_scrollbar.pack(side="bottom", fill="x")
 
-    ttk.Label(frame, text="Informações da Enfermaria:", font=FONT).grid(row=0, column=0, padx=20, pady=10)
-    ttk.Label(frame, text=texto_informacoes, font=FONT, justify="left").grid(row=1, column=0, padx=20, pady=10)
+    v_scrollbar = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+    v_scrollbar.pack(side="right", fill="y")
 
-    ttk.Button(frame, text="Fechar", command=parent.quit).grid(row=2, column=0, padx=20, pady=10)
+    scrollable_frame = tk.Frame(canvas)
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")
+        )
+    )
+
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+    canvas.configure(xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set)
+
+    scrollable_frame.grid_columnconfigure(0, weight=1)
+    scrollable_frame.grid_columnconfigure(1, weight=1)
+
+    ttk.Label(scrollable_frame, text="Informações da Enfermaria", font=FONT).grid(row=0, column=0, padx=20, pady=10, sticky="w")
+
+    def exibir_informacoes():
+        informacoes = buscar_informacoes_enfermaria()
+        label_informacoes.config(text=informacoes)
+
+    label_informacoes = ttk.Label(scrollable_frame, text="", font=FONT, justify="left")
+    label_informacoes.grid(row=1, column=0, columnspan=2, padx=20, pady=10, sticky="w")
+
+    ttk.Button(scrollable_frame, text="Buscar Informações", command=exibir_informacoes).grid(row=2, column=0, padx=20, pady=10)
 
 # Código principal
 if __name__ == "__main__":

@@ -73,7 +73,6 @@
    'C:\\Users\\jefer\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\dis.py',
    'PYMODULE'),
   ('editar_informacoes', 'C:\\meu_projeto\\editar_informacoes.py', 'PYMODULE'),
-  ('editar_usuario', 'C:\\meu_projeto\\editar_usuario.py', 'PYMODULE'),
   ('email',
    'C:\\Users\\jefer\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\email\\__init__.py',
    'PYMODULE'),

@@ -11,7 +11,7 @@ from pagina_estoque import pagina_estoque
 from pagina2 import pagina2
 from pagina3 import pagina3
 from pagina4 import pagina4
-from pagina5 import abrir_pesquisa, mostrar_ids
+from pagina5 import mostrar_ids
 from pagina_informacoes_enfermaria import pagina_informacoes_enfermaria
 from editar_informacoes import pagina_editar_informacoes
 from settings import mudar_cor_interface, editar_configuracao, atualizar_programa
@@ -64,25 +64,26 @@ def main():
     frame_content = tk.Frame(root)
     frame_content.pack(side="right", fill="both", expand=True, padx=10, pady=10)
 
-    def show_page(page):
+    def show_page(page, *args):
         for widget in frame_content.winfo_children():
             widget.destroy()
-        page(frame_content)
+        page(frame_content, *args)
 
     buttons = [
-        ("Cadastro de Instituição", pagina1),
-        ("Estoque da Instituição", pagina_estoque),
-        ("Cadastro de Usuário", pagina2),
-        ("Produtos na Enfermaria", pagina3),
-        ("Cadastro de Quartos", pagina4),
-        ("Pesquisa de Usuários", abrir_pesquisa),
-        ("IDs de Usuários e Instituições", mostrar_ids),
-        ("Informações da Enfermaria", pagina_informacoes_enfermaria),
-        ("Editar Informações", pagina_editar_informacoes)
+        ("Cadastro de Instituição", lambda: show_page(pagina1)),
+        ("Estoque da Instituição", lambda: show_page(pagina_estoque)),
+        ("Cadastro de Usuário", lambda: show_page(pagina2)),
+        ("Produtos na Enfermaria", lambda: show_page(pagina3)),
+        ("Cadastro de Quartos", lambda: show_page(pagina4)),
+        ("Pesquisa de Usuários", lambda: show_page(mostrar_ids)),
+        ("IDs de Usuários e Instituições", lambda: show_page(mostrar_ids)),
+        ("Informações da Enfermaria", lambda: show_page(pagina_informacoes_enfermaria)),
+        ("Editar Informações", lambda: show_page(pagina_editar_informacoes, 1, "Nome Exemplo", "Endereço Exemplo", "Telefone Exemplo", "Email Exemplo", "Observação Exemplo",
+                                                 1, "Nome Instituição Exemplo", "Endereço Instituição Exemplo", "Telefone Instituição Exemplo", "Email Instituição Exemplo"))
     ]
 
     for text, page in buttons:
-        ttk.Button(scrollable_frame, text=text, command=lambda p=page: show_page(p), style="TButton").pack(pady=5)
+        ttk.Button(scrollable_frame, text=text, command=page, style="TButton").pack(pady=5)
 
     root.mainloop()
 
