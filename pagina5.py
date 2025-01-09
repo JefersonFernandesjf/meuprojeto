@@ -5,6 +5,17 @@ import cx_Oracle
 
 FONT = ("Arial", 14)
 
+def buscar_informacoes_usuario(id_usuario):
+    try:
+        with conectar_bd() as connection:
+            with connection.cursor() as cursor:
+                query = "SELECT * FROM usuarios WHERE id_usuario = :1"
+                cursor.execute(query, [id_usuario])
+                return cursor.fetchone()
+    except cx_Oracle.DatabaseError as e:
+        messagebox.showerror("Erro", f"Erro ao buscar informações do usuário: {e}")
+        return None
+
 def mostrar_ids(parent):
     frame = tk.Frame(parent)
     frame.pack(fill="both", expand=True)
@@ -31,43 +42,33 @@ def mostrar_ids(parent):
 
     scrollable_frame.grid_columnconfigure(0, weight=1)
     scrollable_frame.grid_columnconfigure(1, weight=1)
-    scrollable_frame.grid_columnconfigure(2, weight=1)
 
-    # IDs de Usuários
-    ttk.Label(scrollable_frame, text="IDs de Usuários:", font=FONT).grid(row=0, column=0, padx=20, pady=10, sticky="e")
-    try:
-        with conectar_bd() as connection:
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT id_usuario, nome FROM usuarios")
-                usuarios = cursor.fetchall()
-                texto_usuarios = "\n".join([f"{id_usuario}: {nome}" for id_usuario, nome in usuarios])
-                ttk.Label(scrollable_frame, text=texto_usuarios, font=FONT, justify="left").grid(row=1, column=0, padx=20, pady=10, sticky="w")
-    except cx_Oracle.DatabaseError as e:
-        messagebox.showerror("Erro", f"Erro ao buscar IDs de usuários: {e}")
+    ttk.Label(scrollable_frame, text="ID do Usuário:", font=FONT).grid(row=0, column=0, padx=20, pady=10, sticky="e")
+    entry_id_usuario = ttk.Entry(scrollable_frame, width=30, font=FONT)
+    entry_id_usuario.grid(row=0, column=1, padx=20, pady=10, sticky="w")
 
-    # IDs de Instituições
-    ttk.Label(scrollable_frame, text="IDs de Instituições:", font=FONT).grid(row=0, column=1, padx=20, pady=10, sticky="e")
-    try:
-        with conectar_bd() as connection:
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT id_instituicao, nome FROM instituicao")
-                instituicoes = cursor.fetchall()
-                texto_instituicoes = "\n".join([f"{id_instituicao}: {nome}" for id_instituicao, nome in instituicoes])
-                ttk.Label(scrollable_frame, text=texto_instituicoes, font=FONT, justify="left").grid(row=1, column=1, padx=20, pady=10, sticky="w")
-    except cx_Oracle.DatabaseError as e:
-        messagebox.showerror("Erro", f"Erro ao buscar IDs de instituições: {e}")
+    def pesquisar():
+        id_usuario = entry_id_usuario.get()
+        if not id_usuario:
+            messagebox.showwarning("Aviso", "Por favor, insira o ID do usuário.")
+            return
 
-    # IDs de Enfermarias
-    ttk.Label(scrollable_frame, text="IDs de Enfermarias:", font=FONT).grid(row=0, column=2, padx=20, pady=10, sticky="e")
-    try:
-        with conectar_bd() as connection:
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT id_enfermaria, medicamento FROM enfermaria")
-                enfermarias = cursor.fetchall()
-                texto_enfermarias = "\n".join([f"{id_enfermaria}: {medicamento}" for id_enfermaria, medicamento in enfermarias])
-                ttk.Label(scrollable_frame, text=texto_enfermarias, font=FONT, justify="left").grid(row=1, column=2, padx=20, pady=10, sticky="w")
-    except cx_Oracle.DatabaseError as e:
-        messagebox.showerror("Erro", f"Erro ao buscar IDs de enfermarias: {e}")
+        info_usuario = buscar_informacoes_usuario(id_usuario)
+        if info_usuario:
+            info_text = f"""
+            ID do Usuário: {info_usuario[0]}
+            Nome: {info_usuario[1]}
+            Endereço: {info_usuario[2]}
+            Telefone: {info_usuario[3]}
+            Email: {info_usuario[4]}
+            Observação: {info_usuario[5]}
+            ID da Instituição: {info_usuario[6]}
+            """
+            messagebox.showinfo("Informações do Usuário", info_text)
+        else:
+            messagebox.showerror("Erro", "Usuário não encontrado.")
+
+    ttk.Button(scrollable_frame, text="Pesquisar", command=pesquisar).grid(row=1, column=0, columnspan=2, pady=10)
 
 # Código principal
 if __name__ == "__main__":

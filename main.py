@@ -1,11 +1,6 @@
-import logging
 import tkinter as tk
 from tkinter import ttk
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s:%(message)s', filename='app.log')
-logger = logging.getLogger()
-
-# Importar as páginas
 from pagina1 import pagina1
 from pagina_estoque import pagina_estoque
 from pagina2 import pagina2
@@ -15,13 +10,13 @@ from pagina5 import mostrar_ids
 from pagina_informacoes_enfermaria import pagina_informacoes_enfermaria
 from editar_informacoes import pagina_editar_informacoes
 from settings import mudar_cor_interface, editar_configuracao, atualizar_programa
+from pesquisa_usuario import pagina_pesquisa_usuario
+from pagina_mostrar_ids import pagina_mostrar_ids
 
 def main():
-    logger.info('Iniciando o programa...')
-    
     root = tk.Tk()
     root.title("Sistema de Gerenciamento de Instituição")
-    root.geometry("1024x768")  # Tamanho inicial da janela
+    root.geometry("1024x768")
 
     # Aplicar tema
     style = ttk.Style()
@@ -75,11 +70,10 @@ def main():
         ("Cadastro de Usuário", lambda: show_page(pagina2)),
         ("Produtos na Enfermaria", lambda: show_page(pagina3)),
         ("Cadastro de Quartos", lambda: show_page(pagina4)),
-        ("Pesquisa de Usuários", lambda: show_page(mostrar_ids)),
-        ("IDs de Usuários e Instituições", lambda: show_page(mostrar_ids)),
+        ("Pesquisa de Usuários", lambda: show_page(pagina_pesquisa_usuario)),
+        ("IDs de Usuários, Instituições e Enfermarias", lambda: show_page(pagina_mostrar_ids)),  # Novo botão adicionado
         ("Informações da Enfermaria", lambda: show_page(pagina_informacoes_enfermaria)),
-        ("Editar Informações", lambda: show_page(pagina_editar_informacoes, 1, "Nome Exemplo", "Endereço Exemplo", "Telefone Exemplo", "Email Exemplo", "Observação Exemplo",
-                                                 1, "Nome Instituição Exemplo", "Endereço Instituição Exemplo", "Telefone Instituição Exemplo", "Email Instituição Exemplo"))
+        ("Editar Informações", lambda: show_page(pagina_editar_informacoes, 1))  # Ajuste para chamar função correta com ID do usuário
     ]
 
     for text, page in buttons:

@@ -9,7 +9,7 @@ def ler_configuracao():
         config = {
             "DB_USER": "SYSTEM",
             "DB_PASSWORD": "cloud1%",
-            "DB_DSN": "localhost/XE"
+            "DB_DSN": "localhost:1521/XE"
         }
         salvar_configuracao(config)
         return config

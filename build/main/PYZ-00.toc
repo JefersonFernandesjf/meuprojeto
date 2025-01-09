@@ -259,6 +259,7 @@
   ('pagina_informacoes_enfermaria',
    'C:\\meu_projeto\\pagina_informacoes_enfermaria.py',
    'PYMODULE'),
+  ('pagina_mostrar_ids', 'C:\\meu_projeto\\pagina_mostrar_ids.py', 'PYMODULE'),
   ('pathlib',
    'C:\\Users\\jefer\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\pathlib\\__init__.py',
    'PYMODULE'),
