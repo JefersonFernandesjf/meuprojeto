@@ -269,6 +269,7 @@
   ('pathlib._local',
    'C:\\Users\\jefer\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\pathlib\\_local.py',
    'PYMODULE'),
+  ('pesquisa_usuario', 'C:\\meu_projeto\\pesquisa_usuario.py', 'PYMODULE'),
   ('pickle',
    'C:\\Users\\jefer\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\pickle.py',
    'PYMODULE'),

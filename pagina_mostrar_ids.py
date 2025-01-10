@@ -29,7 +29,7 @@ def buscar_ids_enfermarias():
     try:
         with conectar_bd() as connection:
             with connection.cursor() as cursor:
-                cursor.execute("SELECT id_enfermaria, medicamento FROM enfermaria")
+                cursor.execute("SELECT id_enfermaria, nome FROM enfermaria")
                 return cursor.fetchall()
     except cx_Oracle.DatabaseError as e:
         messagebox.showerror("Erro", f"Erro ao buscar IDs das enfermarias: {e}")
@@ -78,7 +78,7 @@ def pagina_mostrar_ids(parent):
     # IDs de Enfermarias
     ttk.Label(scrollable_frame, text="IDs de Enfermarias:", font=FONT).grid(row=0, column=2, padx=20, pady=10, sticky="w")
     enfermarias = buscar_ids_enfermarias()
-    texto_enfermarias = "\n".join([f"{id_enfermaria}: {medicamento}" for id_enfermaria, medicamento in enfermarias])
+    texto_enfermarias = "\n".join([f"{id_enfermaria}: {nome}" for id_enfermaria, nome in enfermarias])
     ttk.Label(scrollable_frame, text=texto_enfermarias, font=FONT, justify="left").grid(row=1, column=2, padx=20, pady=10, sticky="w")
 
 # Código principal
@@ -86,4 +86,5 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.withdraw()  # Ocultar a janela principal
     pagina_mostrar_ids(root)
+    root.deiconify()  # Mostrar a janela principal
     root.mainloop()

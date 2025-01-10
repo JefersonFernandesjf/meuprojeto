@@ -64,6 +64,11 @@ def main():
             widget.destroy()
         page(frame_content, *args)
 
+    # Definir os IDs que você deseja usar
+    user_id = 1
+    institution_id = 2
+    ward_id = 3
+
     buttons = [
         ("Cadastro de Instituição", lambda: show_page(pagina1)),
         ("Estoque da Instituição", lambda: show_page(pagina_estoque)),
@@ -71,9 +76,9 @@ def main():
         ("Produtos na Enfermaria", lambda: show_page(pagina3)),
         ("Cadastro de Quartos", lambda: show_page(pagina4)),
         ("Pesquisa de Usuários", lambda: show_page(pagina_pesquisa_usuario)),
-        ("IDs de Usuários, Instituições e Enfermarias", lambda: show_page(pagina_mostrar_ids)),  # Novo botão adicionado
+        ("IDs de Usuários, Instituições e Enfermarias", lambda: show_page(pagina_mostrar_ids)),
         ("Informações da Enfermaria", lambda: show_page(pagina_informacoes_enfermaria)),
-        ("Editar Informações", lambda: show_page(pagina_editar_informacoes, 1))  # Ajuste para chamar função correta com ID do usuário
+        ("Editar Informações", lambda: show_page(pagina_editar_informacoes, user_id, institution_id, ward_id))  # Ajuste para chamar função com todos os IDs necessários
     ]
 
     for text, page in buttons:

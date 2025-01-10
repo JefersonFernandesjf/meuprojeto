@@ -11,8 +11,7 @@ def buscar_informacoes_enfermaria():
             with connection.cursor() as cursor:
                 query = """
                     SELECT 
-                        e.id_enfermaria, e.medicamento, e.quantidade, e.data_registro,
-                        i.nome_instituicao
+                        e.id_enfermaria, e.nome, i.nome AS nome_instituicao
                     FROM enfermaria e
                     JOIN instituicao i ON e.id_instituicao = i.id_instituicao
                 """
@@ -23,8 +22,8 @@ def buscar_informacoes_enfermaria():
                     informacoes = ""
                     for linha in resultados:
                         informacoes += f"ID Enfermaria: {linha[0]}\n"
-                        informacoes += f"Medicamento: {linha[1]}\nQuantidade: {linha[2]}\nData de Registro: {linha[3]}\n"
-                        informacoes += f"Instituição: {linha[4]}\n\n"
+                        informacoes += f"Nome da Enfermaria: {linha[1]}\n"
+                        informacoes += f"Instituição: {linha[2]}\n\n"
                     return informacoes
                 else:
                     return "Nenhuma informação encontrada."
@@ -74,4 +73,5 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.withdraw()  # Ocultar a janela principal
     pagina_informacoes_enfermaria(root)
+    root.deiconify()  # Mostrar a janela principal
     root.mainloop()
